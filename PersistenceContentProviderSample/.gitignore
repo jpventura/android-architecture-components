@@ -1,9 +1,16 @@
+# Android Studio
 *.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
+.externalNativeBuild
+.gradle
+/.idea/libraries
+/.idea/workspace.xml
 /build
 /captures
-.externalNativeBuild
+/local.properties
+
+# VSCode
+.classpath
+.project
+.settings
+.vscode
