@@ -21,12 +21,11 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.util.Log;
 
 import com.example.android.contentprovidersample.data.Cheese;
 import com.example.android.contentprovidersample.provider.SampleContentProvider;
@@ -38,11 +37,59 @@ import com.example.android.contentprovidersample.provider.SampleContentProvider;
  * <p>Since the data is exposed through the ContentProvider, other apps can read and write the
  * content in a similar manner to this.</p>
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final int LOADER_CHEESES = 1;
 
+    private SwipeRefreshLayout mSwipeContainer;
+
     private CheeseAdapter mCheeseAdapter;
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case LOADER_CHEESES:
+                return new CursorLoader(getApplicationContext(),
+                        SampleContentProvider.URI_CHEESE,
+                        new String[]{Cheese.COLUMN_NAME},
+                        null, null, null);
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case LOADER_CHEESES:
+                mCheeseAdapter.setCheeses(data);
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case LOADER_CHEESES:
+                mCheeseAdapter.setCheeses(null);
+                break;
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        // Your code to refresh the list here.
+        // Make sure you call swipeContainer.setRefreshing(false)
+        // once the network request has completed successfully.
+        fetchTimelineAsync();
+    }
+
+    private void fetchTimelineAsync() {
+        mSwipeContainer.setRefreshing(false);
+        Log.d(MainActivity.class.getSimpleName(), "fetchTimelineAsync");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,84 +101,12 @@ public class MainActivity extends AppCompatActivity {
         mCheeseAdapter = new CheeseAdapter();
         list.setAdapter(mCheeseAdapter);
 
-        getSupportLoaderManager().initLoader(LOADER_CHEESES, null, mLoaderCallbacks);
-    }
+        mSwipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        mSwipeContainer.setOnRefreshListener(this);
 
-    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks =
-            new LoaderManager.LoaderCallbacks<Cursor>() {
 
-                @Override
-                public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                    switch (id) {
-                        case LOADER_CHEESES:
-                            return new CursorLoader(getApplicationContext(),
-                                    SampleContentProvider.URI_CHEESE,
-                                    new String[]{Cheese.COLUMN_NAME},
-                                    null, null, null);
-                        default:
-                            throw new IllegalArgumentException();
-                    }
-                }
-
-                @Override
-                public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                    switch (loader.getId()) {
-                        case LOADER_CHEESES:
-                            mCheeseAdapter.setCheeses(data);
-                            break;
-                    }
-                }
-
-                @Override
-                public void onLoaderReset(Loader<Cursor> loader) {
-                    switch (loader.getId()) {
-                        case LOADER_CHEESES:
-                            mCheeseAdapter.setCheeses(null);
-                            break;
-                    }
-                }
-
-            };
-
-    private static class CheeseAdapter extends RecyclerView.Adapter<CheeseAdapter.ViewHolder> {
-
-        private Cursor mCursor;
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(parent);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            if (mCursor.moveToPosition(position)) {
-                holder.mText.setText(mCursor.getString(
-                        mCursor.getColumnIndexOrThrow(Cheese.COLUMN_NAME)));
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mCursor == null ? 0 : mCursor.getCount();
-        }
-
-        void setCheeses(Cursor cursor) {
-            mCursor = cursor;
-            notifyDataSetChanged();
-        }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-
-            TextView mText;
-
-            ViewHolder(ViewGroup parent) {
-                super(LayoutInflater.from(parent.getContext()).inflate(
-                        android.R.layout.simple_list_item_1, parent, false));
-                mText = (TextView) itemView.findViewById(android.R.id.text1);
-            }
-
-        }
-
+        getSupportLoaderManager().initLoader(LOADER_CHEESES, null, this);
     }
 
 }
