@@ -22,6 +22,7 @@ import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -29,6 +30,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.contentprovidersample.backend.PostItemService;
+import com.example.android.contentprovidersample.backend.Record;
 import com.example.android.contentprovidersample.data.Cheese;
 import com.example.android.contentprovidersample.data.CheeseDao;
 import com.example.android.contentprovidersample.data.SampleDatabase;
@@ -119,6 +122,9 @@ public class SampleContentProvider extends ContentProvider {
                 final long id = SampleDatabase.getInstance(context).cheese()
                         .insert(Cheese.fromContentValues(values));
                 context.getContentResolver().notifyChange(uri, null);
+                Intent intent = new Intent(context, PostItemService.class);
+                intent.putExtra(Record.class.getCanonicalName(), new Record(values));
+                context.startService(intent);
                 return ContentUris.withAppendedId(uri, id);
             case CODE_CHEESE_ITEM:
                 throw new IllegalArgumentException("Invalid URI, cannot insert with ID: " + uri);
@@ -202,6 +208,7 @@ public class SampleContentProvider extends ContentProvider {
                 for (int i = 0; i < valuesArray.length; i++) {
                     cheeses[i] = Cheese.fromContentValues(valuesArray[i]);
                 }
+                context.getContentResolver().notifyChange(uri, null);
                 return database.cheese().insertAll(cheeses).length;
             case CODE_CHEESE_ITEM:
                 throw new IllegalArgumentException("Invalid URI, cannot insert with ID: " + uri);

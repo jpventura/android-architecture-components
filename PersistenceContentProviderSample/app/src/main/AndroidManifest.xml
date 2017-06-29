@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     Copyright (C) 2017 The Android Open Source Project
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -11,26 +10,25 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.contentprovidersample">
 
-    <permission android:name="com.example.android.contentprovidersample.provider.READ_WRITE"/>
+    <permission android:name="com.example.android.contentprovidersample.provider.READ_WRITE" />
 
     <application
+        android:name=".PersistenceApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".PersistenceApplication"
         android:supportsRtl="true"
         android:theme="@style/Theme.ContentProviderSample"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -38,7 +36,15 @@
             android:name=".provider.SampleContentProvider"
             android:authorities="com.example.android.contentprovidersample.provider"
             android:exported="true"
-            android:permission="com.example.android.contentprovidersample.provider.READ_WRITE"/>
+            android:permission="com.example.android.contentprovidersample.provider.READ_WRITE" />
+
+        <service
+            android:name=".backend.PostCollectionService"
+            android:exported="false" />
+
+        <service
+            android:name=".backend.GetCollectionService"
+            android:exported="false" />
 
     </application>
 

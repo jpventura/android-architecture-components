@@ -20,7 +20,10 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.database.Cursor;
+
+import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 
 /**
@@ -43,7 +46,7 @@ public interface CheeseDao {
      * @param cheese A new cheese.
      * @return The row ID of the newly inserted cheese.
      */
-    @Insert
+    @Insert(onConflict=REPLACE)
     long insert(Cheese cheese);
 
     /**
@@ -52,7 +55,7 @@ public interface CheeseDao {
      * @param cheeses An array of new cheeses.
      * @return The row IDs of the newly inserted cheeses.
      */
-    @Insert
+    @Insert(onConflict=REPLACE)
     long[] insertAll(Cheese[] cheeses);
 
     /**

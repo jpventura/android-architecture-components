@@ -16,6 +16,7 @@
 
 package com.example.android.contentprovidersample;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -27,6 +28,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.example.android.contentprovidersample.backend.GetCollectionService;
+import com.example.android.contentprovidersample.backend.PostCollectionService;
 import com.example.android.contentprovidersample.data.Cheese;
 import com.example.android.contentprovidersample.provider.SampleContentProvider;
 
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case LOADER_CHEESES:
-                mCheeseAdapter.setCheeses(data);
+                mCheeseAdapter.swapCursor(data);
                 break;
         }
     }
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
             case LOADER_CHEESES:
-                mCheeseAdapter.setCheeses(null);
+                mCheeseAdapter.swapCursor(null);
                 break;
         }
     }
@@ -89,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements
     private void fetchTimelineAsync() {
         mSwipeContainer.setRefreshing(false);
         Log.d(MainActivity.class.getSimpleName(), "fetchTimelineAsync");
+        // startService(new Intent(this, GetCollectionService.class));
+        startService(new Intent(this, PostCollectionService.class));
     }
 
     @Override
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
 
         final RecyclerView list = (RecyclerView) findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(list.getContext()));
-        mCheeseAdapter = new CheeseAdapter();
+        mCheeseAdapter = new CheeseAdapter(this, null);
         list.setAdapter(mCheeseAdapter);
 
         mSwipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
