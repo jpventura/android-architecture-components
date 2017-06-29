@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.android.contentprovidersample;
+package com.example.android.contentprovidersample.main;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -27,9 +29,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
+import com.example.android.contentprovidersample.R;
 import com.example.android.contentprovidersample.backend.GetCollectionService;
-import com.example.android.contentprovidersample.backend.PostCollectionService;
 import com.example.android.contentprovidersample.data.Cheese;
 import com.example.android.contentprovidersample.provider.SampleContentProvider;
 
@@ -42,6 +45,7 @@ import com.example.android.contentprovidersample.provider.SampleContentProvider;
  */
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener,
         SwipeRefreshLayout.OnRefreshListener {
 
     private static final int LOADER_CHEESES = 1;
@@ -49,6 +53,13 @@ public class MainActivity extends AppCompatActivity implements
     private SwipeRefreshLayout mSwipeContainer;
 
     private CheeseAdapter mCheeseAdapter;
+
+    private int count = 0;
+
+    @Override
+    public void onClick(View view) {
+        fakeUpdate();
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -92,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements
     private void fetchTimelineAsync() {
         mSwipeContainer.setRefreshing(false);
         Log.d(MainActivity.class.getSimpleName(), "fetchTimelineAsync");
-        // startService(new Intent(this, GetCollectionService.class));
-        startService(new Intent(this, PostCollectionService.class));
+        startService(new Intent(this, GetCollectionService.class));
+        // startService(new Intent(this, PostCollectionService.class));
     }
 
     @Override
@@ -111,7 +122,23 @@ public class MainActivity extends AppCompatActivity implements
         mSwipeContainer.setOnRefreshListener(this);
 
 
+        findViewById(R.id.fab).setOnClickListener(this);
+
         getSupportLoaderManager().initLoader(LOADER_CHEESES, null, this);
+    }
+
+    private void fakeUpdate() {
+        final Uri uri = SampleContentProvider.URI_CHEESE.buildUpon().appendPath("1").build();
+
+        new Thread(new Runnable(){
+            @Override
+            public void run(){
+                ContentValues values = new ContentValues();
+                values.put("_id", 1);
+                values.put("name", "Teste " + Integer.toString(count++));
+                getContentResolver().update(uri, values, null, null);
+            }
+        }).start();
     }
 
 }

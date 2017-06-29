@@ -24,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ContentProviderSample"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity">
+        <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,6 +37,10 @@
             android:authorities="com.example.android.contentprovidersample.provider"
             android:exported="true"
             android:permission="com.example.android.contentprovidersample.provider.READ_WRITE" />
+
+        <service
+            android:name=".backend.PostItemService"
+            android:exported="false" />
 
         <service
             android:name=".backend.PostCollectionService"

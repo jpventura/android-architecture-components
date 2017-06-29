@@ -20,7 +20,7 @@ public class PostItemService extends IntentService implements DatabaseReference.
     @Override
     public void onComplete(DatabaseError error, DatabaseReference reference) {
         if (null == error) {
-
+            Log.d(TAG, "sucess");
         } else {
             Log.e(TAG, error.getMessage(), error.toException());
         }
@@ -29,6 +29,8 @@ public class PostItemService extends IntentService implements DatabaseReference.
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Record record = intent.getParcelableExtra(Record.class.getCanonicalName());
+
+        Log.d(TAG, "onHandleIntent " + record.toString());
 
         FirebaseDatabase.getInstance()
                 .getReference()

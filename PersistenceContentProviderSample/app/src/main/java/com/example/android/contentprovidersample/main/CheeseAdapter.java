@@ -1,4 +1,4 @@
-package com.example.android.contentprovidersample;
+package com.example.android.contentprovidersample.main;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.android.contentprovidersample.CursorRecyclerAdapter;
 
 class CheeseAdapter extends CursorRecyclerAdapter<CheeseAdapter.ViewHolder> implements View.OnClickListener {
 

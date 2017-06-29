@@ -26,9 +26,12 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DataSetObservable;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.contentprovidersample.backend.PostItemService;
 import com.example.android.contentprovidersample.backend.Record;
@@ -70,6 +73,7 @@ public class SampleContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+
         return true;
     }
 
@@ -77,6 +81,8 @@ public class SampleContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
             @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        Log.e(this.getClass().getSimpleName(), "query " + uri.toString());
+
         final int code = MATCHER.match(uri);
         if (code == CODE_CHEESE_DIR || code == CODE_CHEESE_ITEM) {
             final Context context = getContext();
@@ -113,6 +119,8 @@ public class SampleContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        Log.e(this.getClass().getSimpleName(), "insert " + uri.toString());
+
         switch (MATCHER.match(uri)) {
             case CODE_CHEESE_DIR:
                 final Context context = getContext();
@@ -136,6 +144,8 @@ public class SampleContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection,
             @Nullable String[] selectionArgs) {
+        Log.e(this.getClass().getSimpleName(), "delete " + uri.toString());
+
         switch (MATCHER.match(uri)) {
             case CODE_CHEESE_DIR:
                 throw new IllegalArgumentException("Invalid URI, cannot update without ID" + uri);
@@ -156,6 +166,8 @@ public class SampleContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
             @Nullable String[] selectionArgs) {
+        Log.e(this.getClass().getSimpleName(), "update " + uri.toString());
+
         switch (MATCHER.match(uri)) {
             case CODE_CHEESE_DIR:
                 throw new IllegalArgumentException("Invalid URI, cannot update without ID" + uri);
@@ -169,6 +181,11 @@ public class SampleContentProvider extends ContentProvider {
                 final int count = SampleDatabase.getInstance(context).cheese()
                         .update(cheese);
                 context.getContentResolver().notifyChange(uri, null);
+
+                Intent intent = new Intent(context, PostItemService.class);
+                intent.putExtra(Record.class.getCanonicalName(), new Record(values));
+                context.startService(intent);
+
                 return count;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -197,6 +214,8 @@ public class SampleContentProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] valuesArray) {
+        Log.e(this.getClass().getSimpleName(), "bulkInsert " + uri.toString());
+
         switch (MATCHER.match(uri)) {
             case CODE_CHEESE_DIR:
                 final Context context = getContext();
