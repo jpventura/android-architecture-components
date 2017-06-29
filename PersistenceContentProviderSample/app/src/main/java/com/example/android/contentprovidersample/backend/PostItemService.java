@@ -20,7 +20,7 @@ public class PostItemService extends IntentService implements DatabaseReference.
     @Override
     public void onComplete(DatabaseError error, DatabaseReference reference) {
         if (null == error) {
-            Log.d(TAG, "sucess");
+            Log.d(TAG, "success");
         } else {
             Log.e(TAG, error.getMessage(), error.toException());
         }
