@@ -5,7 +5,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.example.android.contentprovidersample.data.Cheese;
 import com.google.gson.Gson;
 
 public class Record implements Parcelable {
@@ -33,11 +32,6 @@ public class Record implements Parcelable {
     public Record(ContentValues values) {
         _id = values.containsKey("_id") ? values.getAsLong("_id") : null;
         name = values.containsKey("name") ? values.getAsString("name") : null;
-    }
-
-    public Record(Cheese cheese) {
-        _id = cheese.id;
-        name = cheese.name;
     }
 
     public Record(@NonNull Long id, @NonNull final String name) {
